@@ -14,7 +14,7 @@ app.post('/send-code', async (req, res) => {
         service: 'Gmail',
         auth: {
             user: 'info@parmarketing.agency',
-            pass: 'yzqtpocumbafxgbt' // Use App Password from Google
+            pass: 'yzqtpocumbafxgbt' 
         }
     });
 
