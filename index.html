@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Challenge</title>
+</head>
+
+<body>
+    <div style="margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 10px; border: 1px solid #ddd;">
+        <h3 style="margin-bottom: 10px;">💻 Code Challenge</h3>
+        <p style="margin-bottom: 10px;">Write a function in your preferred language to reverse a string.</p>
+
+        <!-- Countdown Timer -->
+        <p id="timer" style="font-weight: bold; color: #cc0000; font-size: 18px; margin-bottom: 15px;">Time left: 30:00</p>
+
+        <textarea id="codeInput" rows="10"
+            style="width: 100%; padding: 10px; font-family: monospace; background-color: #f4f4f4; border: 1px solid #ccc; border-radius: 5px;"
+            placeholder="Type your code here..."></textarea>
+
+        <br><br>
+
+        <button id="submitButton" onclick="submitCode()"
+            style="padding: 10px 20px; font-size: 16px; background-color: #0073aa; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Submit Code
+        </button>
+
+        <p id="codeMessage" style="margin-top: 15px;"></p>
+    </div>
+
+    <script>
+        // Countdown timer
+        let duration = 30 * 60; // 30 minutes in seconds
+        const timerDisplay = document.getElementById("timer");
+        const codeInput = document.getElementById("codeInput");
+        const submitBtn = document.getElementById("submitButton");
+
+        const timerInterval = setInterval(function () {
+            let minutes = Math.floor(duration / 60);
+            let seconds = duration % 60;
+            timerDisplay.textContent = "Time left: " +
+                String(minutes).padStart(2, '0') + ":" +
+                String(seconds).padStart(2, '0');
+
+            if (--duration < 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = "⏰ Time is up!";
+                codeInput.disabled = true;
+                submitBtn.disabled = true;
+                submitBtn.style.backgroundColor = "#ccc";
+                document.getElementById("codeMessage").style.color = "red";
+                document.getElementById("codeMessage").innerText = "Time expired. You cannot submit now.";
+            }
+        }, 1000);
+
+        // Submit code to backend API
+        function submitCode() {
+            const code = codeInput.value;
+            if (code.trim() === "") {
+                alert("Please enter your code.");
+                return;
+            }
+
+            fetch("http://localhost:3000/send-code", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ code: code })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("codeMessage").style.color = "green";
+                        document.getElementById("codeMessage").innerText = "✅ Email sent successfully!";
+                    } else {
+                        throw new Error(data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                    document.getElementById("codeMessage").style.color = "red";
+                    document.getElementById("codeMessage").innerText = "❌ Failed to send email.";
+                });
+        }
+    </script>
+</body>
+
+</html>
